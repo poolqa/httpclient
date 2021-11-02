@@ -2,7 +2,7 @@ package netHttpClient
 
 import (
 	"bytes"
-	"github/poolqa/httpclient"
+	"github.com/poolqa/httpclient"
 	"io"
 	"net/http"
 	"time"

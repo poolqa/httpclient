@@ -3,8 +3,8 @@ package fastHttpClient
 import (
 	"bytes"
 	"crypto/tls"
+	"github.com/poolqa/httpclient"
 	"github.com/valyala/fasthttp"
-	"github/poolqa/httpclient"
 	"net"
 	"net/http"
 	"time"

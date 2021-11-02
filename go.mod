@@ -1,4 +1,4 @@
-module github/poolqa/httpclient
+module github.com/poolqa/httpclient
 
 go 1.15
 
