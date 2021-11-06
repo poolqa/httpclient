@@ -25,25 +25,34 @@ func NewClient(cli *http.Client) httpclient.IClient {
 	}
 }
 
-func (cli *netClient) Execute(method string, url string, headers map[string]string, body *bytes.Buffer) (int, []byte, error) {
+func (cli *netClient) executeWithReturnMore(method string, url string, headers map[string]string, body *bytes.Buffer, config *httpclient.ReturnConfig) (int, *httpclient.CliHeaders, []byte, error) {
 	var req *http.Request
 	var err error
+	var respHeader *httpclient.CliHeaders
 	if body == nil {
 		req, err = http.NewRequest(method, url, nil)
 	} else {
 		req, err = http.NewRequest(method, url, body)
 	}
 	if err != nil {
-		return -1, nil, err
+		return -1, nil, nil, err
 	}
 	cli.setHeaders(req, headers)
 	resp, err := cli.client.Do(req)
 	if err != nil {
-		return -1, nil, err
+		return -1, nil, nil, err
 	}
 	defer resp.Body.Close()
 	respBody, err := io.ReadAll(resp.Body)
-	return resp.StatusCode, respBody, err
+	if config != nil {
+		respHeader = httpclient.CopyNetClientHeader(resp.Header, config)
+	}
+	return resp.StatusCode, respHeader, respBody, err
+}
+
+func (cli *netClient) Execute(method string, url string, headers map[string]string, body *bytes.Buffer) (int, []byte, error) {
+	status, _, respBody, err := cli.executeWithReturnMore(method, url, headers, body, httpclient.NotReturnMore)
+	return status, respBody, err
 }
 
 func (cli *netClient) Get(url string, headers map[string]string) (int, []byte, error) {
