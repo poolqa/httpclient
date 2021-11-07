@@ -25,7 +25,7 @@ func NewClient(cli *http.Client) httpclient.IClient {
 	}
 }
 
-func (cli *netClient) executeWithReturnMore(method string, url string, headers map[string]string, body *bytes.Buffer, config *httpclient.ReturnConfig) (int, *httpclient.CliHeaders, []byte, error) {
+func (cli *netClient) ExecuteWithReturnMore(method string, url string, headers map[string]string, body *bytes.Buffer, config *httpclient.ReturnConfig) (int, *httpclient.CliHeaders, []byte, error) {
 	var req *http.Request
 	var err error
 	var respHeader *httpclient.CliHeaders
@@ -45,13 +45,14 @@ func (cli *netClient) executeWithReturnMore(method string, url string, headers m
 	defer resp.Body.Close()
 	respBody, err := io.ReadAll(resp.Body)
 	if config != nil {
-		respHeader = httpclient.CopyNetClientHeader(resp.Header, config)
+		respHeader = httpclient.CopyNetRespHeader(resp, config)
+		resp.Cookies()
 	}
 	return resp.StatusCode, respHeader, respBody, err
 }
 
 func (cli *netClient) Execute(method string, url string, headers map[string]string, body *bytes.Buffer) (int, []byte, error) {
-	status, _, respBody, err := cli.executeWithReturnMore(method, url, headers, body, httpclient.NotReturnMore)
+	status, _, respBody, err := cli.ExecuteWithReturnMore(method, url, headers, body, httpclient.NotReturnMore)
 	return status, respBody, err
 }
 

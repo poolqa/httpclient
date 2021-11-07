@@ -5,6 +5,7 @@ import (
 )
 
 type IClient interface {
+	ExecuteWithReturnMore(method string, url string, headers map[string]string, body *bytes.Buffer, config *ReturnConfig) (int, *CliHeaders, []byte, error)
 	Execute(method string, url string, headers map[string]string, body *bytes.Buffer) (int, []byte, error)
 	Get(url string, headers map[string]string) (int, []byte, error)
 	Post(url string, headers map[string]string, body *bytes.Buffer) (int, []byte, error)
