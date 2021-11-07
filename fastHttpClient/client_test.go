@@ -3,6 +3,7 @@ package fastHttpClient
 import (
 	"crypto/tls"
 	"fmt"
+	"github.com/poolqa/httpclient"
 	"github.com/valyala/fasthttp"
 	"net"
 	"net/http"
@@ -18,6 +19,19 @@ func TestNewClientAndGet(t *testing.T) {
 		t.Error("fastHttpClient send GET FAIL")
 	} else {
 		t.Log("fastHttpClient send GET PASS")
+	}
+}
+
+func TestNewClientAndReturnMore(t *testing.T) {
+	cli := NewDefaultClient()
+	status, header, _, err := cli.ExecuteWithReturnMore(http.MethodGet, "https://www.google.com",
+		nil, nil, httpclient.ReturnAll)
+	fmt.Printf("status:%v, err:%v\n", status, err)
+	fmt.Printf("header:%#v\n", header)
+	if status != http.StatusOK {
+		t.Error("netHttpClient send GET FAIL")
+	} else {
+		t.Log("netHttpClient send GET PASS")
 	}
 }
 

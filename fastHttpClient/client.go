@@ -33,11 +33,12 @@ func NewClient(doTimeout time.Duration, client *fasthttp.Client) *fastClient {
 	}
 }
 
-func (cli *fastClient) Execute(method string, url string, headers map[string]string, body *bytes.Buffer) (int, []byte, error) {
+func (cli *fastClient) ExecuteWithReturnMore(method string, url string, headers map[string]string, body *bytes.Buffer, config *httpclient.ReturnConfig) (int, *httpclient.CliHeaders, []byte, error) {
 	req := fasthttp.AcquireRequest()
 	resp := fasthttp.AcquireResponse()
 	defer fasthttp.ReleaseResponse(resp)
 	defer fasthttp.ReleaseRequest(req)
+	var respHeader *httpclient.CliHeaders
 
 	req.SetRequestURI(url)
 	req.Header.SetMethod(method)
@@ -47,9 +48,17 @@ func (cli *fastClient) Execute(method string, url string, headers map[string]str
 	}
 	err := cli.client.DoTimeout(req, resp, cli.doTimeout)
 	if err != nil {
-		return -1, nil, err
+		return -1, nil, nil, err
 	}
-	return resp.StatusCode(), resp.Body(), err
+	if config != nil {
+		respHeader = httpclient.CopyFastRespHeader(resp, config)
+	}
+	return resp.StatusCode(), respHeader, resp.Body(), err
+}
+
+func (cli *fastClient) Execute(method string, url string, headers map[string]string, body *bytes.Buffer) (int, []byte, error) {
+	status, _, respBody, err := cli.ExecuteWithReturnMore(method, url, headers, body, httpclient.NotReturnMore)
+	return status, respBody, err
 }
 
 func (cli *fastClient) Get(url string, headers map[string]string) (int, []byte, error) {

@@ -46,7 +46,6 @@ func (cli *netClient) ExecuteWithReturnMore(method string, url string, headers m
 	respBody, err := io.ReadAll(resp.Body)
 	if config != nil {
 		respHeader = httpclient.CopyNetRespHeader(resp, config)
-		resp.Cookies()
 	}
 	return resp.StatusCode, respHeader, respBody, err
 }

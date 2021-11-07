@@ -57,6 +57,7 @@ func CopyFastRespHeader(resp *fasthttp.Response, config *ReturnConfig) *CliHeade
 			}
 			cookies.Cookies[string(key)] = c
 		})
+		ch.Cookies = cookies
 	}
 	if config.IncludeHeader {
 		ch.Header = make(map[string][]string)
