@@ -1,20 +1,20 @@
-package httpclient
+package fastHttpClient
 
 import (
 	"errors"
 	"github.com/valyala/fasthttp"
 )
 
-type fastHttpCookies struct {
+type FastHttpCookies struct {
 	Cookies map[string]*fasthttp.Cookie
 }
 
-func (c *fastHttpCookies) IsExisted(key string) bool {
+func (c *FastHttpCookies) IsExisted(key string) bool {
 	_, ok := c.Cookies[key]
 	return ok
 }
 
-func (c *fastHttpCookies) GetValue(key string) (string, error) {
+func (c *FastHttpCookies) GetValue(key string) (string, error) {
 	v, ok := c.Cookies[key]
 	if !ok {
 		return "", errors.New("not existed")

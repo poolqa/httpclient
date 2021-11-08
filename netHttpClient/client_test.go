@@ -2,7 +2,7 @@ package netHttpClient
 
 import (
 	"fmt"
-	"github.com/poolqa/httpclient"
+	"github.com/poolqa/httpclient/common"
 	"net/http"
 	"testing"
 )
@@ -21,7 +21,7 @@ func TestNewClientAndGet(t *testing.T) {
 func TestNewClientAndReturnMore(t *testing.T) {
 	cli := NewDefaultClient()
 	status, header, _, err := cli.ExecuteWithReturnMore(http.MethodGet, "https://www.google.com",
-		nil, nil, httpclient.ReturnAll)
+		nil, nil, common.ReturnAll)
 	fmt.Printf("status:%v, err:%v\n", status, err)
 	fmt.Printf("header:%#v\n", header)
 	if status != http.StatusOK {

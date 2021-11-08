@@ -1,4 +1,4 @@
-package httpclient
+package common
 
 type ReturnConfig struct {
 	IncludeHeader     bool

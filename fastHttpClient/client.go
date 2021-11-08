@@ -4,13 +4,14 @@ import (
 	"bytes"
 	"crypto/tls"
 	"github.com/poolqa/httpclient"
+	"github.com/poolqa/httpclient/common"
 	"github.com/valyala/fasthttp"
 	"net"
 	"net/http"
 	"time"
 )
 
-type fastClient struct {
+type FastClient struct {
 	client    *fasthttp.Client
 	doTimeout time.Duration
 }
@@ -26,19 +27,19 @@ func NewDefaultClient() httpclient.IClient {
 	})
 }
 
-func NewClient(doTimeout time.Duration, client *fasthttp.Client) *fastClient {
-	return &fastClient{
+func NewClient(doTimeout time.Duration, client *fasthttp.Client) *FastClient {
+	return &FastClient{
 		doTimeout: doTimeout,
 		client:    client,
 	}
 }
 
-func (cli *fastClient) ExecuteWithReturnMore(method string, url string, headers map[string]string, body *bytes.Buffer, config *httpclient.ReturnConfig) (int, *httpclient.CliHeaders, []byte, error) {
+func (cli *FastClient) ExecuteWithReturnMore(method string, url string, headers map[string]string, body *bytes.Buffer, config *common.ReturnConfig) (int, httpclient.IHeaders, []byte, error) {
 	req := fasthttp.AcquireRequest()
 	resp := fasthttp.AcquireResponse()
 	defer fasthttp.ReleaseResponse(resp)
 	defer fasthttp.ReleaseRequest(req)
-	var respHeader *httpclient.CliHeaders
+	var respHeader *FastCliHeaders
 
 	req.SetRequestURI(url)
 	req.Header.SetMethod(method)
@@ -51,53 +52,53 @@ func (cli *fastClient) ExecuteWithReturnMore(method string, url string, headers 
 		return -1, nil, nil, err
 	}
 	if config != nil {
-		respHeader = httpclient.CopyFastRespHeader(resp, config)
+		respHeader = CopyFastRespHeader(resp, config)
 	}
 	return resp.StatusCode(), respHeader, resp.Body(), err
 }
 
-func (cli *fastClient) Execute(method string, url string, headers map[string]string, body *bytes.Buffer) (int, []byte, error) {
-	status, _, respBody, err := cli.ExecuteWithReturnMore(method, url, headers, body, httpclient.NotReturnMore)
+func (cli *FastClient) Execute(method string, url string, headers map[string]string, body *bytes.Buffer) (int, []byte, error) {
+	status, _, respBody, err := cli.ExecuteWithReturnMore(method, url, headers, body, common.NotReturnMore)
 	return status, respBody, err
 }
 
-func (cli *fastClient) Get(url string, headers map[string]string) (int, []byte, error) {
+func (cli *FastClient) Get(url string, headers map[string]string) (int, []byte, error) {
 	return cli.Execute(http.MethodGet, url, headers, nil)
 }
 
-func (cli *fastClient) Post(url string, headers map[string]string, body *bytes.Buffer) (int, []byte, error) {
+func (cli *FastClient) Post(url string, headers map[string]string, body *bytes.Buffer) (int, []byte, error) {
 	return cli.Execute(http.MethodPost, url, headers, body)
 }
 
-func (cli *fastClient) Put(url string, headers map[string]string, body *bytes.Buffer) (int, []byte, error) {
+func (cli *FastClient) Put(url string, headers map[string]string, body *bytes.Buffer) (int, []byte, error) {
 	return cli.Execute(http.MethodPut, url, headers, body)
 }
 
-func (cli *fastClient) Delete(url string, headers map[string]string, body *bytes.Buffer) (int, []byte, error) {
+func (cli *FastClient) Delete(url string, headers map[string]string, body *bytes.Buffer) (int, []byte, error) {
 	return cli.Execute(http.MethodDelete, url, headers, body)
 }
 
-func (cli *fastClient) Options(url string, headers map[string]string, body *bytes.Buffer) (int, []byte, error) {
+func (cli *FastClient) Options(url string, headers map[string]string, body *bytes.Buffer) (int, []byte, error) {
 	return cli.Execute(http.MethodOptions, url, headers, body)
 }
 
-func (cli *fastClient) Patch(url string, headers map[string]string, body *bytes.Buffer) (int, []byte, error) {
+func (cli *FastClient) Patch(url string, headers map[string]string, body *bytes.Buffer) (int, []byte, error) {
 	return cli.Execute(http.MethodPatch, url, headers, body)
 }
 
-func (cli *fastClient) Head(url string, headers map[string]string, body *bytes.Buffer) (int, []byte, error) {
+func (cli *FastClient) Head(url string, headers map[string]string, body *bytes.Buffer) (int, []byte, error) {
 	return cli.Execute(http.MethodHead, url, headers, body)
 }
 
-func (cli *fastClient) Connect(url string, headers map[string]string, body *bytes.Buffer) (int, []byte, error) {
+func (cli *FastClient) Connect(url string, headers map[string]string, body *bytes.Buffer) (int, []byte, error) {
 	return cli.Execute(http.MethodConnect, url, headers, body)
 }
 
-func (cli *fastClient) Trace(url string, headers map[string]string, body *bytes.Buffer) (int, []byte, error) {
+func (cli *FastClient) Trace(url string, headers map[string]string, body *bytes.Buffer) (int, []byte, error) {
 	return cli.Execute(http.MethodTrace, url, headers, body)
 }
 
-func (cli *fastClient) setHeaders(req *fasthttp.Request, headers map[string]string) {
+func (cli *FastClient) setHeaders(req *fasthttp.Request, headers map[string]string) {
 	if len(headers) == 0 {
 		return
 	}
