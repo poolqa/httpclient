@@ -28,6 +28,10 @@ func TestNewClientAndReturnMore(t *testing.T) {
 		nil, nil, common.ReturnAll)
 	fmt.Printf("status:%v, err:%v\n", status, err)
 	fmt.Printf("header:%#v\n", header)
+	fmt.Printf("Content-Type:%#v\n", header.GetParam("Content-Type"))
+	fmt.Printf("cookies:%#v\n", header.GetCookies())
+	v, _ := header.GetCookies().GetValue("1P_JAR")
+	fmt.Printf("cookies:%#v\n", v)
 	if status != http.StatusOK {
 		t.Error("netHttpClient send GET FAIL")
 	} else {
