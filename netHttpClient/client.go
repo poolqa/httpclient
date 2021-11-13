@@ -52,7 +52,7 @@ func (cli *NetClient) ExecuteWithReturnMore(method string, url string, headers m
 }
 
 func (cli *NetClient) Execute(method string, url string, headers map[string]string, body *bytes.Buffer) (int, *httpclient.Response, error) {
-	return cli.ExecuteWithReturnMore(method, url, headers, body, common.NotReturnMore)
+	return cli.ExecuteWithReturnMore(method, url, headers, body, common.JustReturnHeaders)
 }
 
 func (cli *NetClient) Get(url string, headers map[string]string) (int, *httpclient.Response, error) {

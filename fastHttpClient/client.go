@@ -58,7 +58,7 @@ func (cli *FastClient) ExecuteWithReturnMore(method string, url string, headers 
 }
 
 func (cli *FastClient) Execute(method string, url string, headers map[string]string, body *bytes.Buffer) (int, *httpclient.Response, error) {
-	return cli.ExecuteWithReturnMore(method, url, headers, body, common.NotReturnMore)
+	return cli.ExecuteWithReturnMore(method, url, headers, body, common.JustReturnHeaders)
 }
 
 func (cli *FastClient) Get(url string, headers map[string]string) (int, *httpclient.Response, error) {

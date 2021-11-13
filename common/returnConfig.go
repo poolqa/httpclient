@@ -8,16 +8,23 @@ type ReturnConfig struct {
 }
 
 var NotReturnMore *ReturnConfig
+var JustReturnHeaders *ReturnConfig
 var JustReturnCookies *ReturnConfig
 var ReturnAll *ReturnConfig
 
 func init() {
 	NotReturnMore = NewNotReturnMore()
+	JustReturnHeaders = NewJustReturnHeaders()
 	JustReturnCookies = NewJustReturnCookies()
 	ReturnAll = NewReturnAll()
 }
+
 func NewNotReturnMore() *ReturnConfig {
 	return &ReturnConfig{}
+}
+
+func NewJustReturnHeaders() *ReturnConfig {
+	return &ReturnConfig{IncludeHeader: true}
 }
 
 func NewJustReturnCookies() *ReturnConfig {
