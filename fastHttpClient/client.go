@@ -12,26 +12,33 @@ import (
 )
 
 type FastClient struct {
-	client    *fasthttp.Client
-	doTimeout time.Duration
+	client            *fasthttp.Client
+	defaultReturnMode *common.ReturnConfig
+	doTimeout         time.Duration
 }
 
 func NewDefaultClient() httpclient.IClient {
-	return NewClient(30*time.Second, &fasthttp.Client{
-		ReadTimeout:  30 * time.Second,
-		WriteTimeout: 30 * time.Second,
-		Dial: func(addr string) (net.Conn, error) {
-			return fasthttp.DialDualStackTimeout(addr, time.Duration(60)*time.Second)
-		},
-		TLSConfig: &tls.Config{InsecureSkipVerify: true},
-	})
+	return NewClient(30*time.Second, common.JustReturnHeaders,
+		&fasthttp.Client{
+			ReadTimeout:  30 * time.Second,
+			WriteTimeout: 30 * time.Second,
+			Dial: func(addr string) (net.Conn, error) {
+				return fasthttp.DialDualStackTimeout(addr, time.Duration(60)*time.Second)
+			},
+			TLSConfig: &tls.Config{InsecureSkipVerify: true},
+		})
 }
 
-func NewClient(doTimeout time.Duration, client *fasthttp.Client) *FastClient {
-	return &FastClient{
-		doTimeout: doTimeout,
-		client:    client,
+func NewClient(doTimeout time.Duration, returnMode *common.ReturnConfig, client *fasthttp.Client) *FastClient {
+	cli := &FastClient{
+		doTimeout:         doTimeout,
+		defaultReturnMode: returnMode,
+		client:            client,
 	}
+	if cli.defaultReturnMode == nil {
+		cli.defaultReturnMode = common.JustReturnHeaders
+	}
+	return cli
 }
 
 func (cli *FastClient) ExecuteWithReturnMore(method string, url string, headers map[string]string, body *bytes.Buffer, config *common.ReturnConfig) (int, *httpclient.Response, error) {
@@ -58,7 +65,7 @@ func (cli *FastClient) ExecuteWithReturnMore(method string, url string, headers 
 }
 
 func (cli *FastClient) Execute(method string, url string, headers map[string]string, body *bytes.Buffer) (int, *httpclient.Response, error) {
-	return cli.ExecuteWithReturnMore(method, url, headers, body, common.JustReturnHeaders)
+	return cli.ExecuteWithReturnMore(method, url, headers, body, cli.defaultReturnMode)
 }
 
 func (cli *FastClient) Get(url string, headers map[string]string) (int, *httpclient.Response, error) {

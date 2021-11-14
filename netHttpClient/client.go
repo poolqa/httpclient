@@ -10,20 +10,26 @@ import (
 )
 
 type NetClient struct {
-	client *http.Client
+	client            *http.Client
+	defaultReturnMode *common.ReturnConfig
 }
 
 func NewDefaultClient() httpclient.IClient {
-	return NewClient(&http.Client{
+	return NewClient(common.JustReturnHeaders, &http.Client{
 		Timeout:   30 * time.Second,
 		Transport: http.DefaultTransport,
 	})
 }
 
-func NewClient(cli *http.Client) httpclient.IClient {
-	return &NetClient{
-		client: cli,
+func NewClient(returnMode *common.ReturnConfig, client *http.Client) httpclient.IClient {
+	cli := &NetClient{
+		defaultReturnMode: returnMode,
+		client:            client,
 	}
+	if cli.defaultReturnMode == nil {
+		cli.defaultReturnMode = common.JustReturnHeaders
+	}
+	return cli
 }
 
 func (cli *NetClient) ExecuteWithReturnMore(method string, url string, headers map[string]string, body *bytes.Buffer, config *common.ReturnConfig) (int, *httpclient.Response, error) {
@@ -52,7 +58,7 @@ func (cli *NetClient) ExecuteWithReturnMore(method string, url string, headers m
 }
 
 func (cli *NetClient) Execute(method string, url string, headers map[string]string, body *bytes.Buffer) (int, *httpclient.Response, error) {
-	return cli.ExecuteWithReturnMore(method, url, headers, body, common.JustReturnHeaders)
+	return cli.ExecuteWithReturnMore(method, url, headers, body, cli.defaultReturnMode)
 }
 
 func (cli *NetClient) Get(url string, headers map[string]string) (int, *httpclient.Response, error) {
