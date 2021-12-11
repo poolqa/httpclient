@@ -2,9 +2,11 @@ package netHttpClient
 
 import (
 	"bytes"
+	"crypto/tls"
 	"github.com/poolqa/httpclient"
 	"github.com/poolqa/httpclient/common"
 	"io"
+	"net"
 	"net/http"
 	"time"
 )
@@ -16,8 +18,19 @@ type NetClient struct {
 
 func NewDefaultClient() httpclient.IClient {
 	return NewClient(common.JustReturnHeaders, &http.Client{
-		Timeout:   30 * time.Second,
-		Transport: http.DefaultTransport,
+		Timeout: 30 * time.Second,
+		Transport: &http.Transport{
+			IdleConnTimeout: 60 * time.Second,
+			MaxConnsPerHost: 500,
+			MaxIdleConns:    100,
+			TLSClientConfig: &tls.Config{
+				InsecureSkipVerify: true,
+			},
+			DialContext: (&net.Dialer{
+				Timeout:   30 * time.Second,
+				KeepAlive: 60 * time.Second,
+			}).DialContext,
+		},
 	})
 }
 
